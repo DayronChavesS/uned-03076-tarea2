@@ -1,0 +1,292 @@
+===============
+SCRIPTS TAREA 2
+===============
+
+CAPITULO 1
+==========
+
+-----------
+SECCION 1.2
+-----------
+
+[R1]
+configure terminal
+hostname R1
+no ip domain lookup
+enable secret gns
+line console 0
+password gnstres
+login
+exit
+line vty 0 4
+password gnstres
+login
+exit
+service password-encryption
+banner motd # Acceso no Autorizado Esta Prohibido #
+exit
+clock set 12:13:00 March 07 2022
+copy running-config startup-config
+
+[R2]
+configure terminal
+hostname R2
+no ip domain lookup
+enable secret gns
+line console 0
+password gnstres
+login
+exit
+line vty 0 4
+password gnstres
+login
+exit
+service password-encryption
+banner motd # Acceso no Autorizado Esta Prohibido #
+exit
+clock set 12:20:00 March 07 2022
+copy running-config startup-config
+
+-----------
+SECCION 1.3
+-----------
+
+[R1]
+configure terminal
+interface f0/0
+no shutdown
+exit
+interface f0/0.100
+description RED ESTUDIANTES
+encapsulation dot1q 100
+ip address 192.168.1.1 255.255.255.192
+exit
+interface f0/0.200
+description RED CLASES
+encapsulation dot1q 200
+ip address 192.168.1.65 255.255.255.224
+exit
+exit
+show ip interface brief
+
+-----------
+SECCION 1.4
+-----------
+
+[R2]
+configure terminal
+interface f0/0
+ip address 192.168.1.97 255.255.255.240
+no shutdown
+exit
+interface s0/0
+ip address 10.0.0.2 255.255.255.252
+no shutdown
+exit
+router eigrp 1
+network 10.0.0.0 255.255.255.252
+network 192.168.1.96 255.255.255.240
+end
+copy running-config startup-config
+
+[R1]
+configure terminal
+interface s0/0
+ip address 10.0.0.1 255.255.255.252
+no shutdown
+exit
+router eigrp 1
+network 10.0.0.0 255.255.255.252
+network 192.168.1.0 255.255.255.192
+network 192.168.1.64 255.255.255.224
+end
+copy running-config startup-config
+
+[R2]
+ping 192.168.1.1
+ping 192.168.1.65
+
+[R1]
+ping 192.168.1.97
+
+-----------
+SECCION 1.5
+-----------
+
+[S1]
+configure terminal
+hostname S1
+no ip domain-lookup
+enable secret gns
+line console 0
+password gnstres
+login
+exit
+line vty 0 4
+password gnstres
+login
+exit
+service password-encryption
+banner motd # Acceso no Autorizado Esta Prohibido #
+exit
+clock set 01:20:00 March 07 2022
+copy running-config startup-config
+
+[S2]
+configure terminal
+hostname S2
+no ip domain-lookup
+enable secret gns
+line console 0
+password gnstres
+login
+exit
+line vty 0 4
+password gnstres
+login
+exit
+service password-encryption
+banner motd # Acceso no Autorizado Esta Prohibido #
+exit
+clock set 01:25:00 March 07 2022
+copy running-config startup-config
+
+-----------
+SECCION 1.6
+-----------
+
+[S1]
+vlan database
+vlan 100 name Estudiantes
+vlan 200 name Clases
+vlan 999 name Direcciones
+vlan 1000 name Nativa
+exit
+configure terminal
+interface vlan 200
+ip address 192.168.1.66 255.255.255.224
+no shutdown
+ip default-gateway 192.168.1.65
+interface vlan 1
+ip address 192.168.1.2 255.255.255.192
+no shutdown
+ip default-gateway 192.168.1.1
+interface range f0/1 - 15, f1/1 - 15
+switchport mode access
+switchport access vlan 999
+shutdown
+exit
+
+[S2]
+configure terminal
+interface vlan 1
+ip address 192.168.1.98 255.255.255.240
+no shutdown
+ip default-gateway 192.168.1.97
+interface range f0/1 - 15, f1/1 - 15
+switchport mode access
+shutdown
+exit
+
+-----------
+SECCION 1.7
+-----------
+
+[S1]
+interface f1/0
+switchport mode access
+switchport access vlan 100
+exit
+exit
+show vlan-switch brief
+
+-----------
+SECCION 1.8
+-----------
+
+[S1]
+configure terminal
+interface f0/0
+switchport mode trunk
+switchport trunk native vlan 1000
+switchport trunk allowed vlan 1,100,200,1000,1002,1003,1003,1004,1005
+exit
+exit
+copy running-config startup-config
+show interfaces trunk
+
+CAPITULO 2
+==========
+
+-----------
+SECCION 2.1
+-----------
+
+[R1]
+configure terminal
+ip dhcp excluded-address 192.168.1.1 192.168.1.5
+ip dhcp pool R1_cliente_LAN
+network 192.168.1.0 255.255.255.192
+domain-name gnstres-lab.net
+default-router 192.168.1.1
+lease 2 12 30
+exit
+ip dhcp excluded-address 192.168.1.97 192.168.1.101
+ip dhcp pool R2_Cliente_LAN
+network 192.168.1.96 255.255.255.240
+default-router 192.168.1.97
+domain-name gnstres-lab.net
+lease 2 12 30
+exit
+exit
+copy running-config startup-config
+
+-----------
+SECCION 2.2
+-----------
+
+[R1]
+show ip dhcp pool
+show ip dhcp binding
+show ip dhcp server statistics 
+
+-----------
+SECCION 2.3
+-----------
+
+[PC-A]
+ip dhcp
+show ip 
+ping 192.168.1.1
+
+CAPITULO 3
+==========
+
+
+-----------
+SECCION 3.1
+-----------
+
+[R2]
+configure terminal
+interface f0/0
+ip helper-address 10.0.0.1
+exit
+exit
+copy running-configuration startup-configuration
+
+-----------
+SECCION 3.2
+-----------
+
+[PC-B]
+ip dhcp
+show ip
+ping 192.168.1.1
+
+[R1]
+show ip dhcp binding
+show ip dhcp server statistics
+
+[R2]
+show ip dhcp server statistics
